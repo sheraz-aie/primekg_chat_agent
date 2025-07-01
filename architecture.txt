@@ -1,0 +1,19 @@
+graph TD
+    A[User] -- "Asks a question" --> B(LCEL Chain);
+
+    subgraph "LCEL Chain Execution"
+        B -- "1. Gets user question" --> C{"get_schema() Tool"};
+        C -- "2. Fetches DB schema" --> D{Neo4j MCP Server};
+        B -- "3. Passes question + schema to LLM" --> E[LLM];
+        E -- "4. Generates Cypher query" --> B;
+        B -- "5. Passes Cypher query to 'read-neo4j-cypher' tool" --> F{"execute_cypher() Tool"};
+        F -- "6. Executes query" --> D;
+    end
+
+    subgraph "External Systems"
+      D -- "Communicates with" --> G[Local Neo4j 'primekg' DB];
+    end
+
+    D -- "7. Returns JSON result" --> F;
+    F -- "8. Result to chain" --> B;
+    B -- "9. Returns final JSON to User" --> H[JSON Output];
